@@ -29,8 +29,8 @@ public class BusService {
 	@Autowired
 	BusRepository busRepository;
 
-	@Autowired
-	ItineraryService itineraryService;
+//	@Autowired
+//	ItineraryService itineraryService;
 
 
 	public List<Bus> importBus() throws Exception {
@@ -65,12 +65,12 @@ public class BusService {
 		}
 	}
 
-//	public Bus list(String nome) throws ObjectNotFoundException {
-//		Bus bus = busRepository.findByNome(nome);
-//		if (bus == null) {
-//		}
-//		return bus;
-//	}
+	public List<Bus> listByName(String nome) throws Exception {
+		List<Bus> busList = busRepository.findByNome(nome);
+		if(busList == null || busList.isEmpty())
+			throw new ChangeSetPersister.NotFoundException();;
+		return busList;
+	}
 
 	public void delete(Bus bus){ busRepository.delete(bus);}
 
@@ -96,33 +96,7 @@ public class BusService {
 //			return false;
 //		}
 //	}
-//
-//	public void updateLineCreateIfNotExists(Bus item) throws Exception {
-//		try {
-//			Bus dbModel = busRepository.findById(item.getId());
-//			if (!dbModel.fullEquals(item)) {
-//				dbModel.setCodigo(item.getCodigo());
-//				dbModel.setNome(item.getNome());
-//				busRepository.save(dbModel);
-//			}
-//		} catch (NoSuchElementException e) {
-//			busRepository.save(item);
-//		}
-//	}
 
-
-	public void update(BusDto dto, HttpServletRequest request) {
-
-		Bus bus = new Bus();
-
-		if (!bus.fullEquals(dto)) {
-			bus.setId(dto.getId());
-			bus.setNome(dto.getNome());
-			bus.setCodigo(dto.getCodigo());
-			busRepository.save(bus);
-		}
-
-	}
 
 
 	public List<Bus> listAll() throws Exception {
@@ -132,12 +106,6 @@ public class BusService {
 		return lineList;
 	}
 
-	public List<Bus> listAll(String nome) throws Exception {
-		List<Bus> lineList = busRepository.findByNomeContainingIgnoreCase(nome);
-		if(lineList == null || lineList.isEmpty())
-			throw new ChangeSetPersister.NotFoundException();;
-		return lineList;
-	}
 
 	
 	public List<Bus> findBuslinesBySpot(ItineraryDto dto) {

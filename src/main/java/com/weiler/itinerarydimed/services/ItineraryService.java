@@ -1,11 +1,10 @@
 package com.weiler.itinerarydimed.services;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.weiler.itinerarydimed.dto.ItineraryDto;
+import com.google.gson.*;
+import com.weiler.itinerarydimed.dto.BusDto;
+import com.weiler.itinerarydimed.dto.ItinerarioDTO;
 import com.weiler.itinerarydimed.entities.Bus;
 import com.weiler.itinerarydimed.entities.Itinerary;
 import com.weiler.itinerarydimed.repositorys.BusRepository;
@@ -22,6 +21,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+
 @Service
 public class ItineraryService {
 
@@ -31,93 +31,105 @@ public class ItineraryService {
 	@Autowired
 	BusRepository busRepository;
 
-	public boolean runImport() {
-		try {
-			for (Bus bus : busRepository.findAll()) {
-				List<Itinerary> importedSpots = importPoaSpotsByLine(bus);
-				if (importedSpots == null || importedSpots.isEmpty())
-					continue;
-
-				for (Itinerary item : importedSpots)
-					updateSpotCreateIfNotExists(item, bus);
-			}
-
-			return true;
-
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	private void updateSpotCreateIfNotExists(Itinerary item, Bus busLine) throws Exception {
-		try {
-			Itinerary dbModel = repository.findById(item.getId()).get();
-
-			updateSpotIfNeeded(item, dbModel);
-			updataRelationship(busLine, dbModel);
-
-		} catch (NoSuchElementException e) {
-			Itinerary dbModel = repository.save(item);
-			updataRelationship(busLine, dbModel);
-		}
-	}
-
-	private void updataRelationship(Bus busLine, Itinerary spotDbModel) {// todo
-		if (busLine.getItineraries() == null)
-			busLine.setItineraries(new HashSet<>());
-		if (!busLine.getSpots().contains(spotDbModel))
-			busLine.getSpots().add(spotDbModel);
-		busRepository.save(busLine);
-	}
-
-	private void updateSpotIfNeeded(Itinerary dtoItem, Itinerary dbModel) {// todo
-
-		if (!dbModel.fullEquals(dtoItem)) {
-			dbModel.setLat(dtoItem.getLat());
-			dbModel.setLng(dtoItem.getLng());
-			repository.save(dbModel);
-		}
-
-	}
-
-	private List<Itinerary> importPoaSpotsByLine(Bus busLine) throws Exception {
+	public ItinerarioDTO importItineraryPrimary(Long idLinha) throws IOException {
 		String theUrl = "http://www.poatransporte.com.br/php/facades/process.php?a=il&p=";
-		URL url = new URL(theUrl + busLine.getId());
+		URL url = new URL(theUrl + idLinha);
 		URLConnection uc = url.openConnection();
 		uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		InputStream in = uc.getInputStream();
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String result = IOUtils.toString(in, StandardCharsets.UTF_8);
-
-		List<Itinerary> incomeSpotsList = spotResultToList(result, busLine);
-		return incomeSpotsList;
-	}
-
-	private List<Itinerary> spotResultToList(String result, Bus busLine)
-			throws IOException, JsonParseException, JsonMappingException {
 		ObjectMapper mapper = new ObjectMapper();
-		ItineraryDto map = mapper.readValue(result, ItineraryDto.class);
-
-		List<Itinerary> incomeSpotsList = new ArrayList<>();
-		int i = 0;
-		while (map.getDetails().containsKey("" + i)) {
-			incomeSpotsList.add(convertSpotMapToModel(busLine, map, i++));
-
+		JsonNode jsonNode = mapper.readTree(result);
+		List<BusDto> bus = new ArrayList<>();
+		for (Integer i = 0; i < jsonNode.size(); i++) {
+			String idBus = i.toString();
+			if (jsonNode.get(idBus) != null) {
+				String latitude = jsonNode.get(idBus).get("lat").asText();
+				String longitude = jsonNode.get(idBus).get("lng").asText();
+				BusDto busDTO = new BusDto(idBus, latitude, longitude);
+				bus.add(busDTO);
+			}
 		}
-		return incomeSpotsList;
+
+		String nome = jsonNode.get("nome").asText();
+		String codigo = jsonNode.get("codigo").asText();
+		ItinerarioDTO itinerarioDTO = new ItinerarioDTO(idLinha.toString(), codigo, nome, bus);
+		return itinerarioDTO;
+
 	}
 
-	private Itinerary convertSpotMapToModel(Bus busLine, ItineraryDto map, int i) {
-		Map innerMap = (Map) (map.getDetails().get("" + i));
-		Double lat = Double.valueOf((String) innerMap.get("lat"));
-		Double lng = Double.valueOf((String) innerMap.get("lng"));
-		return new Itinerary(Long.valueOf(i), busLine, lat, lng);
+	public void importItinerary(Long idLinha) throws IOException {
+		try {
+			ItinerarioDTO itinerarioDTO = importItineraryPrimary(idLinha);
+
+			for (BusDto pontoDTO : itinerarioDTO.getPontos()) {
+				Itinerary ponto = repository.findByIndiceAndLinha(
+						Long.parseLong(itinerarioDTO.getIdlinha()),
+						Long.parseLong(pontoDTO.getId()));
+				if (ponto == null) {
+					ponto = new Itinerary();
+				}
+				ponto.setIndice(Long.parseLong(pontoDTO.getId()));
+				ponto.setLat(Double.parseDouble(pontoDTO.getLatitude()));
+				ponto.setLng(Double.parseDouble(pontoDTO.getLongitude()));
+				ponto.setBus(busRepository.findById(Long.parseLong(itinerarioDTO.getIdlinha())).get());
+				repository.save(ponto);
+			}
+
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
 	}
 
-	public List<Itinerary> findSpotsByBusline(ItineraryDto lineDto) throws Exception {
-		if(lineDto.getLineId() == null)
+	public ItinerarioDTO updateItinerarySecundary(Long idLinha) throws IOException {
+		String theUrl = "http://www.poatransporte.com.br/php/facades/process.php?a=il&p=";
+		URL url = new URL(theUrl + idLinha);
+		URLConnection uc = url.openConnection();
+		uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		InputStream in = uc.getInputStream();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String result = IOUtils.toString(in, StandardCharsets.UTF_8);
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode jsonNode = mapper.readTree(result);
+		List<BusDto> bus = new ArrayList<>();
+		for (Integer i = 0; i < jsonNode.size(); i++) {
+			String idBus = i.toString();
+			if (jsonNode.get(idBus) != null) {
+				String latitude = jsonNode.get(idBus).get("lat").asText();
+				String longitude = jsonNode.get(idBus).get("lng").asText();
+				BusDto busDTO = new BusDto(idBus, latitude, longitude);
+				bus.add(busDTO);
+			}
+		}
+
+		String nome = jsonNode.get("nome").asText();
+		String codigo = jsonNode.get("codigo").asText();
+		ItinerarioDTO itinerarioDTO = new ItinerarioDTO(idLinha.toString(), codigo, nome, bus);
+		return itinerarioDTO;
+
+	}
+
+
+	public void delete(Itinerary itinerary){ repository.delete(itinerary);}
+
+
+	public List<Itinerary> listAll() throws Exception {
+		List<Itinerary> list = repository.findAll();
+		if(list == null || list.isEmpty())
 			throw new ChangeSetPersister.NotFoundException();
-		return repository.findByLineAndSpotInRadius(lineDto.getLat(), lineDto.getLng(), lineDto.getLineId(), lineDto.getRadiusInMeters());
+		return list;
 	}
+
+//
+//	public List<Itinerary> findSpotsByBusline(ItineraryDto lineDto) throws Exception {
+//		if(lineDto.getLineId() == null)
+//			throw new ChangeSetPersister.NotFoundException();
+//		return repository.findByLineAndSpotInRadius(lineDto.getLat(), lineDto.getLng(), lineDto.getLineId(), lineDto.getRadiusInMeters());
+//	}
+
+
 
 }

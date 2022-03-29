@@ -11,11 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BusRepository extends JpaRepository<Bus, Integer> {
+public interface BusRepository extends JpaRepository<Bus, Long> {
 
-    List<Bus> findByNomeContainingIgnoreCase(String nome);
-
-    Bus findBusById (Integer id);
+   Bus findBusById (Long id);
 
     List<Bus> findByNome(String nome);
 

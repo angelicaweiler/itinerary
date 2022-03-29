@@ -18,24 +18,18 @@ public class Bus  {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String nome;
 
     private String codigo;
 
-    @OneToMany(mappedBy = "id", fetch = FetchType.EAGER, targetEntity = Itinerary.class)
-    private Set<Itinerary> itineraries;
-
-    public Set<Itinerary> getSpots() {
-        return itineraries;
-    }
-
-    public void update(Bus bus){
-        this.nome = bus.getNome();
-        this.codigo = bus.getCodigo();
-    }
+//    @OneToMany(mappedBy = "idLinha", fetch = FetchType.EAGER, targetEntity = Itinerary.class)
+//    private Set<Itinerary> itineraries;
+//
+//    public Set<Itinerary> getSpots() {
+//        return itineraries;
+//    }
 
     @Override
     public int hashCode() {

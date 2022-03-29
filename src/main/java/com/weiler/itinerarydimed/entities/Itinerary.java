@@ -4,10 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 
 @Getter
 @Setter
@@ -16,13 +14,19 @@ import javax.persistence.Id;
 public class Itinerary {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @SequenceGenerator(name = "seqpontotransporte", sequenceName = "seqpontotransporte", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "seqpontotransporte")
+    private Long id;
+    private Long indice;
     private Double lat;
     private Double lng;
+    @ManyToOne
+    @JoinColumn(name="BUS_ID",referencedColumnName = "id")
+    private Bus bus;
 
-    public Itinerary(Long valueOf, Bus busLine, Double lat, Double lng) {
-    }
+//
+//    public Itinerary(String idBus, String latitude, String longitude) {
+//    }
 
     @Override
     public String toString() {
@@ -33,29 +37,31 @@ public class Itinerary {
                 '}';
     }
 
-    public boolean fullEquals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Itinerary other = (Itinerary) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (lat == null) {
-            if (other.lat != null)
-                return false;
-        } else if (!lat.equals(other.lat))
-            return false;
-        if (lng == null) {
-            if (other.lng != null)
-                return false;
-        } else if (!lng.equals(other.lng))
-            return false;
-        return true;
-    }
+//
+//    public boolean fullEquals(Object obj) {
+//        if (this == obj)
+//            return true;
+//        if (obj == null)
+//            return false;
+//        if (getClass() != obj.getClass())
+//            return false;
+//        Itinerary other = (Itinerary) obj;
+//        if (id == null) {
+//            if (other.id != null)
+//                return false;
+//        } else if (!id.equals(other.id))
+//            return false;
+//        if (lat == null) {
+//            if (other.lat != null)
+//                return false;
+//        } else if (!lat.equals(other.lat))
+//            return false;
+//        if (lng == null) {
+//            if (other.lng != null)
+//                return false;
+//        } else if (!lng.equals(other.lng))
+//            return false;
+//        return true;
+//    }
+
 }

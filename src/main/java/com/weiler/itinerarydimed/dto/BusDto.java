@@ -18,11 +18,11 @@ public class BusDto {
 
 
 
-    private Integer id;
+    private String id;
 
-    private String nome;
+    private String latitude;
 
-    private String codigo;
+    private String longitude;
 
 
 
