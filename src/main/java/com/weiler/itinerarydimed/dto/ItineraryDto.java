@@ -1,37 +1,65 @@
 package com.weiler.itinerarydimed.dto;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class ItineraryDto implements Serializable {
+/**
+ *
+ * @author gianlucampos
+ */
+public class ItinerarioDTO implements Serializable {
 
-	private static final long serialVersionUID = 8903508018512975372L;
+    private String idlinha;
+    private String codigo;
+    private String nome;
+    private List<BusDto> pontos = new ArrayList<>();
 
-	private Double lat;
-	private Double lng;
-	private Long radiusInMeters;
-	private Long lineId;
+    public ItinerarioDTO() {
+    }
 
-	Map<String, Object> details = new LinkedHashMap<>();
+    public ItinerarioDTO(String idlinha, String codigo, String nome, List<BusDto> pontos) {
+        this.idlinha = idlinha;
+        this.codigo = codigo;
+        this.nome = nome;
+        this.pontos = pontos;
+    }
 
-	@JsonAnySetter
-	void setDetail(String key, Object value) {
-		details.put(key, value);
-	}
+    public String getIdlinha() {
+        return idlinha;
+    }
 
-	public Map<String, Object> getDetails() {
-		return details;
-	}
-	
+    public void setIdlinha(String idlinha) {
+        this.idlinha = idlinha;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public List<BusDto> getPontos() {
+        return pontos;
+    }
+
+    public void setPontos(List<BusDto> pontos) {
+        this.pontos = pontos;
+    }
+
+    @Override
+    public String toString() {
+        return "ItinerarioDTO{" + "idlinha=" + idlinha + ", codigo=" + codigo + ", nome=" + nome + ", pontos=" + pontos + '}';
+    }
+
 }

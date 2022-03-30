@@ -2,17 +2,13 @@ package com.weiler.itinerarydimed.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.weiler.itinerarydimed.dto.BusDto;
-import com.weiler.itinerarydimed.dto.ItineraryDto;
 import com.weiler.itinerarydimed.entities.Bus;
 import com.weiler.itinerarydimed.repositorys.BusRepository;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -20,17 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BusService {
 
 	@Autowired
 	BusRepository busRepository;
-
-//	@Autowired
-//	ItineraryService itineraryService;
 
 
 	public List<Bus> importBus() throws Exception {
@@ -55,7 +46,7 @@ public class BusService {
 
 		try {
 			Bus busRepo = busRepository.findBusById(bus.getId());
-			if (!busRepo.fullEquals(bus)) {
+			if (!busRepo.equals(bus)) {
 				busRepo.setCodigo(bus.getCodigo());
 				busRepo.setNome(bus.getNome());
 				busRepository.save(busRepo);
@@ -75,42 +66,11 @@ public class BusService {
 	public void delete(Bus bus){ busRepository.delete(bus);}
 
 //
-//	@Scheduled(fixedRate=360l)
-//	public void updatePoaLines() {
-//		runImport();
-//		itineraryService.runImport();
-//	}
-
-//	public boolean runImport() {
-//		try {
-//			List<Bus> importedLines = importPoaLines();
 //
-//			if (importedLines == null || importedLines.isEmpty())
-//				return false;
-////
-////			for (Bus item : importedLines)
-////				updateLineCreateIfNotExists(item, request);
-////			return true;
 //
-//		} catch (Exception e) {
-//			return false;
-//		}
+//	public List<Bus> findBuslinesBySpot(ItineraryDto dto) {
+//		return busRepository.findBySpotInRadius(dto.getLat(), dto.getLng(), dto.getRadiusInMeters());
 //	}
-
-
-
-	public List<Bus> listAll() throws Exception {
-		List<Bus> lineList = busRepository.findAll();
-		if(lineList == null || lineList.isEmpty())
-			throw new ChangeSetPersister.NotFoundException();
-		return lineList;
-	}
-
-
-	
-	public List<Bus> findBuslinesBySpot(ItineraryDto dto) {
-		return busRepository.findBySpotInRadius(dto.getLat(), dto.getLng(), dto.getRadiusInMeters());
-	}
 
 
 }
