@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import com.weiler.itinerarydimed.dto.BusDto;
 import com.weiler.itinerarydimed.dto.ItineraryDto;
+import com.weiler.itinerarydimed.entities.Bus;
 import com.weiler.itinerarydimed.entities.Itinerary;
 import com.weiler.itinerarydimed.repositorys.BusRepository;
 import com.weiler.itinerarydimed.repositorys.ItineraryRepository;
@@ -83,23 +84,52 @@ public class ItineraryService {
 
 	}
 
-	public void delete(Itinerary itinerary){ repository.delete(itinerary);}
+	public void saveorUpdate(Itinerary itinerary) {
 
-
-	public List<Itinerary> listAll() throws Exception {
-		List<Itinerary> list = repository.findAll();
-		if(list == null || list.isEmpty())
-			throw new ChangeSetPersister.NotFoundException();
-		return list;
+		try {
+			Itinerary itinerary1 = repository.findItineraryById(itinerary.getId());
+			if (!itinerary1.equals(itinerary)) {
+				itinerary1.setLat(itinerary.getLat());
+				itinerary1.setLng(itinerary.getLng());
+				itinerary1.setIndice(itinerary.getIndice());
+				repository.save(itinerary1);
+			}
+		} catch (NoSuchElementException e) {
+			repository.save(itinerary);
+		}
 	}
 
+	public void delete(Itinerary itinerary) {
+		repository.delete(itinerary);
+	}
+
+
 //
-//	public List<Itinerary> findSpotsByBusline(ItineraryDto lineDto) throws Exception {
-//		if(lineDto.getLineId() == null)
-//			throw new ChangeSetPersister.NotFoundException();
-//		return repository.findByLineAndSpotInRadius(lineDto.getLat(), lineDto.getLng(), lineDto.getLineId(), lineDto.getRadiusInMeters());
+//	public void importList(Long idLinha) throws IOException {
+//		try {
+//			ItineraryDto itineraryDto = importItineraryPrimary(idLinha);
+//
+//			for (BusDto busDTO : itineraryDto.getPontos()) {
+//				Itinerary itinerary = repository.findByIndiceAndLinha(
+//						Long.parseLong(itineraryDto.getIdlinha()),
+//						Long.parseLong(busDTO.getId()));
+//				if (itinerary == null) {
+//					itinerary = new Itinerary();
+//				}
+//				itinerary.setIndice(Long.parseLong(busDTO.getId()));
+//				itinerary.setLat(Double.parseDouble(busDTO.getLatitude()));
+//				itinerary.setLng(Double.parseDouble(busDTO.getLongitude()));
+//				itinerary.setBus(busRepository.findById(Long.parseLong(itineraryDto.getIdlinha())).get());
+//				repository.findAll(itinerary);
+//			}
+//
+//
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//		}
+//
 //	}
 
-
-
 }
+
+

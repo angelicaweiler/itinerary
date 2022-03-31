@@ -1,7 +1,6 @@
 package com.weiler.itinerarydimed.controllers;
 
-import com.weiler.itinerarydimed.dto.ItineraryDto;
-import com.weiler.itinerarydimed.entities.Bus;
+import com.weiler.itinerarydimed.controllers.documentation.ItineraryControllerDocumentation;
 import com.weiler.itinerarydimed.entities.Itinerary;
 import com.weiler.itinerarydimed.repositorys.ItineraryRepository;
 import com.weiler.itinerarydimed.services.BusService;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.io.IOException;
 import java.util.List;
 
@@ -21,7 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/itinerary")
-public class ItineraryController {
+public class ItineraryController implements ItineraryControllerDocumentation {
 
 	@Autowired
 	BusService busService;
@@ -33,16 +31,9 @@ public class ItineraryController {
 	ItineraryRepository repository;
 
 	@GetMapping("/import/{idLinha}")
-	public ResponseEntity<?> importItinerario(@PathVariable("idLinha") Long idLinha) throws IOException {
+	public ResponseEntity<?> importItinerary(@PathVariable("idLinha") Long idLinha) throws IOException {
 			itineraryService.importItinerary(idLinha);
 			return new ResponseEntity(repository.findAll(), HttpStatus.OK);
-
-	}
-
-	@GetMapping("/list/{idLinha}")
-	public ResponseEntity<?> importandPostItinerario(@PathVariable("idLinha") Long idLinha) throws IOException {
-		itineraryService.listItinerarySecundary(idLinha);
-		return new ResponseEntity(repository.findAll(), HttpStatus.OK);
 
 	}
 
@@ -53,22 +44,14 @@ public class ItineraryController {
 	}
 
 	@DeleteMapping("{id}/delete")
-	public void delete(Itinerary itinerary) {
+	public ResponseEntity delete(Itinerary itinerary) {
 		itineraryService.delete(itinerary);
+		return ResponseEntity.ok(itinerary);
 	}
 
-//
 //	@PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-//	public @ResponseBody ResponseEntity<?> getSpotsOfBusline(@Validated @RequestBody ItineraryDto dto) throws Exception {
-//			return new ResponseEntity<List<Itinerary>>(itineraryService.findSpotsByBusline(dto), HttpStatus.OK);
-//	}
+//	public @ResponseBody ResponseEntity<?> getSpotsOfBusline(@Validated @RequestBody Double latitude, Double longitude, Long raio) throws Exception {
+//					return new ResponseEntity<List<Itinerary>>(itineraryService.findSpotsByBusline(latitude, longitude, raio), HttpStatus.OK);
+//		}
 //
-//	@PostMapping(value = "/search/intinerary", produces = MediaType.APPLICATION_JSON_VALUE)
-//
-//	public @ResponseBody ResponseEntity<?> getBusLinesByLocation(@Validated @RequestBody ItineraryDto dto) {
-//		return new ResponseEntity<List<Bus>>(busService.findBuslinesBySpot(dto), HttpStatus.OK);
-//
-//	}
-//
-	
 }

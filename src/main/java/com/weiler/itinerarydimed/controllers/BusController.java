@@ -1,24 +1,23 @@
 package com.weiler.itinerarydimed.controllers;
 
-import com.weiler.itinerarydimed.dto.ItineraryDto;
+import com.weiler.itinerarydimed.controllers.documentation.BusControllerDocumentation;
 import com.weiler.itinerarydimed.entities.Bus;
-import com.weiler.itinerarydimed.entities.Itinerary;
 import com.weiler.itinerarydimed.services.BusService;
 import com.weiler.itinerarydimed.services.ItineraryService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/bus")
-public class BusController {
+@AllArgsConstructor
+public class BusController implements BusControllerDocumentation {
 
 	@Autowired
 	BusService busService;
@@ -26,8 +25,8 @@ public class BusController {
 	@Autowired
 	ItineraryService itineraryService;
 
-	@GetMapping(value = "/import", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> getBuss() throws Exception {
+	@GetMapping("/import")
+	public @ResponseBody ResponseEntity<?> importBus() throws Exception {
 		return new ResponseEntity<List<Bus>>(busService.importBus(), HttpStatus.OK);
 	}
 
@@ -43,42 +42,10 @@ public class BusController {
 	}
 
 	@DeleteMapping("{id}/delete")
-	public void delete(Bus bus) {
+	public ResponseEntity delete(Bus bus) {
 		busService.delete(bus);
+		return ResponseEntity.ok(bus);
 	}
-
-
-	
-
-
-	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody ResponseEntity<?> getBusLines() throws Exception {
-		return new ResponseEntity<List<Bus>>(busService.listAll(), HttpStatus.OK);
-		
-	}
-
-//
-//	@PostMapping(value = "/updates")
-//	public void updateBus(@RequestBody Bus bus) throws Exception {
-//		busService.updateLineCreateIfNotExists(bus);
-//	}
-//
-
-	
-
-//
-//
-//	@PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-//	public @ResponseBody ResponseEntity<?> getSpotsOfBusline(@Validated @RequestBody ItineraryDto dto) throws Exception {
-//			return new ResponseEntity<List<Itinerary>>(itineraryService.findSpotsByBusline(dto), HttpStatus.OK);
-//	}
-//
-//	@PostMapping(value = "/search/intinerary", produces = MediaType.APPLICATION_JSON_VALUE)
-//
-//	public @ResponseBody ResponseEntity<?> getBusLinesByLocation(@Validated @RequestBody ItineraryDto dto) {
-//		return new ResponseEntity<List<Bus>>(busService.findBuslinesBySpot(dto), HttpStatus.OK);
-//
-//	}
 
 	
 }

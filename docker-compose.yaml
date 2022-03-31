@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  ItineraryDimed:
+    image: itinerarydimed
+    container_name: itinerarydimed
+    ports:
+      - "8081:80"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/itinerarydimed
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7.9
+    container_name: MySQL
+    ports:
+      - '3306'
+    environment:
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_DATABASE=itinerarydimed
+      - MYSQL_ROOT_PASSWORD=1234
+
+    volumes:
+      - ./docker/volume_mysql:/var/lib/mysql

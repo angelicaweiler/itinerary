@@ -10,4 +10,6 @@ public class ItineraryDimedApplication {
         SpringApplication.run(ItineraryDimedApplication.class, args);
     }
 
+
+
 }
