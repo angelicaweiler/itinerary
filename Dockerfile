@@ -19,7 +19,7 @@
 
 FROM openjdk:12-alpine
 MAINTAINER angelicaweiler
-COPY /target/ItineraryDimed-0.0.1-SNAPSHOT.jar /app/ItineraryDimed-0.0.1-SNAPSHOT.jar
+COPY /target/ItineraryDimed-0.0.1-SNAPSHOT*.jar /app/ItineraryDimed-0.0.1-SNAPSHOT.jar
 WORKDIR /app
 ENTRYPOINT ["java", "-jar", "ItineraryDimed-0.0.1-SNAPSHOT.jar"]
 

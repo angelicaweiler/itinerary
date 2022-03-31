@@ -1,63 +1,54 @@
-Avaliação técnica DIMED
-Aplicação feita com o objetivo de ilustrar a resolução para o desafio técnico proposto pela Viaflow para DIMED. Sistema é capaz de integrar operações da API do http://datapoa.com.br/group/about/mobilidade, podendo filtrar informações importadas da API.
+Avaliação técnica para Desenvolvedor Backend
 
-Tecnologias utilizadas
+Tecnologias utilizadas:
+
 Neste projeto foram utilizadas as seguintes tecnologias:
 
-Java 11
+Java 12
 Spring Boot
 Maven
 JPA
-PostgreSQL 9.6
-Flyway
-Docker
-Foi escolhido o Spring boot por ser altamente personalizável e abranger diversas camadas para desenvolvimento, combinando o modelo Spring MVC com controllers Rest e Spring Data JPA para mapeamento ORM utilizando hibernate.
+MySQL:5.6
+Docker //devido a falta de tempo de execução, não foi possível finalizar o docker.
 
-Além disso, para facilitar a implantação do sistema, o projeto foi encapsulado em Docker e implementado o esquema de migrations para banco de dados com FlyWay no banco PostgresSQL.
+Os frameworks foram escolhidos em razão de facilitarem a configuração do sistema, principalmente no que se refere ao Spring Boot que possui várias ferramentas que facilitam a execução e conexão com banco de dados.
 
-Pré-requisitos
-Para executar aplicação é necessário instalar 2 ferramentas: Docker & Docker Compose.
-
-Docker Para ambientes Linux, Windows e Mac .
-
-Docker Compose Nos ambientes Windows e Mac já são instalados juntos com o Docker, para Linux basta seguir as instruções .
-
-Como rodar a aplicação?
-Para subir aplicação:
-
-$ docker-compose up -d
-Para parar aplicação:
-
-$ docker-compose down
 Como testar a aplicação?
-Recomendo utilizar uma ferramenta de teste de serviços RestFul como Postman ou Insomnia.
+Recomendo utilizar uma ferramenta de teste como Postman.
 
-Endpoints para teste
-Listagem de linhas cadastradas [@GET]
-http://localhost:8082/mobilidade/linhas
+Parte 1)
+Integração com a api datapoa.com.br
 
-Listagem de linhas por Nome [@GET]
-http://localhost:8082/mobilidade/linhas{nome}
-Params
-String nome
+1.1) Listar as linhas de ônibus:
+endpoint para teste:
+Listagem de linhas de ônibus cadastradas [@GET]
+http://localhost:8080/bus/import
+O comando lista e salva as linhas de ônibus.
 
-Listagem de linhas por Coordenadas [@GET]
-http://localhost:8082/mobilidade/linhas/{latitude}/{longitude}/{raio}
-Params
-Double Latitude,Longitude
-Long Raio
+1.2) Listar os itinerários de ônibus:
+Listar os itinerários de ônibus. Em razão da alta quantidade de dados referente aos itinerários de ônibus, foi criado um método para que essa listagem se dê de acordo com o id das linhas de ônibus.
+Método [@GET]
+http://localhost:8080/itinerary/import/{idLinha}
 
-Listagem de itinerario cadastrados [@GET]
-http://localhost:8082/mobilidade/itinerario
+Parte 2)Listagem de linhas por nome:
+Método que lista as linhas de acordo com o nome passando no parâmetro do endpoint.
+http://localhost:8080/bus/{nome} [@GET]
 
-Listagem de itinerario por Linha [@GET]
-http://localhost:8082/mobilidade/itinerario/{idLinha}
-Params
-Long idLinha
+Parte 3) CRUD de Linhas de Itinerários:
+Métodos para CRUD de linhas e itinerários no banco de dados:
+3.1) Método para update ou save no banco de dados, de acordo com as informações passadas:
+http://localhost:8080/bus/register -[@POST]
 
-Importa linhas da API [@GET]
-http://localhost:8082/mobilidade/linhas/import
+http://localhost:8080/itinerary/register -[@POST]
 
-Importa itinerarios da API por Linha
-[@GET] http://localhost:8082/mobilidade/itinerario/import/{idLinha}
-Params Long idLinha
+3.2) Método para delete no banco de dados de acordo com id:
+http://localhost:8080/bus/{id}/delete -[@DELETE]
+
+http://localhost:8080/itinerary/{id}/delete -[@DELETE]
+
+Parte 5) API para criação e consulta de pontos de taxi;
+5.1) AddPontosTaxi:
+Api para adicionar pontos de taxi localmente. Execute no RUN.
+5.2) ListPontosTaxi:
+Api para listar pontos de taxi localmente. Execute no RUN.
+
