@@ -1,15 +1,15 @@
 version: '3.8'
 services:
   ItineraryDimed:
-    image: itinerarydimed
-    container_name: itinerarydimed
+    image: itinerary
+    container_name: itinerary
     ports:
       - "8081:80"
     build:
       context: .
       dockerfile: ./Dockerfile
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/itinerarydimed
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/itinerary
     depends_on:
       - db
   db:

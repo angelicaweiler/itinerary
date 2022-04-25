@@ -19,8 +19,8 @@
 
 FROM openjdk:12-alpine
 MAINTAINER angelicaweiler
-COPY /target/ItineraryDimed-0.0.1-SNAPSHOT*.jar /app/ItineraryDimed-0.0.1-SNAPSHOT.jar
+COPY /target/Itinerary-0.0.1-SNAPSHOT*.jar /app/Itinerary-0.0.1-SNAPSHOT.jar
 WORKDIR /app
-ENTRYPOINT ["java", "-jar", "ItineraryDimed-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "Itinerary-0.0.1-SNAPSHOT.jar"]
 
 EXPOSE 8081

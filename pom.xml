@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.weiler</groupId>
-    <artifactId>ItineraryDimed</artifactId>
+    <artifactId>Itinerary</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ItineraryDimed</name>
-    <description>ItineraryDimed</description>
+    <name>Itinerary</name>
+    <description>Itinerary</description>
     <properties>
         <java.version>12</java.version>
     </properties>
